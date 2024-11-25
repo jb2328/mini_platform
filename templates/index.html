@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT WebSocket Demo</title>
+    <script src="https://cdn.socket.io/3.1.0/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>MQTT Message Logger</h1>
+    <script>
+        console.log("loaded HTML");
+
+        // const socket = io.connect('http://127.0.0.1:5001');
+
+        const socket = io('http://127.0.0.1:5001', {
+            transports: ['websocket'] // Force WebSocket
+                  });
+
+        socket.on('connect', () => {
+            console.log('WebSocket connected');
+        });
+
+        socket.on('mqtt_message', function(msg) {
+            console.log('Received MQTT Message:', msg);
+        });
+
+        socket.on('disconnect', () => {
+            console.log('WebSocket disconnected');
+        });
+
+        // // Connect to the WebSocket server
+        // const socket = io.connect();
+
+        // // Listen for MQTT messages and log them to the console
+        // socket.on('mqtt_message', function(msg) {
+        //     console.log('Received MQTT message:', msg);
+        // });
+    </script>
+</body>
+</html>

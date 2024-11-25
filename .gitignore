@@ -1,0 +1,14 @@
+# Byte-compiled files
+*.pyc
+__pycache__/
+
+# Virtual environment
+venv/
+
+# Secret files
+app_secrets.py
+
+# System files
+.DS_Store
+*.log
+.env
