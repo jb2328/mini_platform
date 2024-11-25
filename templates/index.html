@@ -8,12 +8,13 @@
 </head>
 <body>
     <h1>MQTT Message Logger</h1>
+    <div id="messages"></div> <!-- Container for messages -->
     <script>
         console.log("loaded HTML");
 
         const socket = io('http://127.0.0.1:5001', {
             transports: ['websocket'] // Force WebSocket
-                  });
+        });
 
         socket.on('connect', () => {
             console.log('WebSocket connected');
@@ -21,13 +22,18 @@
 
         socket.on('mqtt_message', function(msg) {
             console.log('Received MQTT Message:', msg);
+
+            // Create a new <p> element
+            const messageElement = document.createElement('p');
+            messageElement.textContent = `Topic: ${msg.topic}, Data: ${msg.data.acp_ts}`;
+
+            // Append the new <p> element to the container
+            document.getElementById('messages').appendChild(messageElement);
         });
 
         socket.on('disconnect', () => {
             console.log('WebSocket disconnected');
         });
-
-
     </script>
 </body>
 </html>
