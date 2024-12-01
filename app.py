@@ -14,7 +14,7 @@ socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*", transp
 @socketio.on('connect')
 def handle_connect():
     print("WebSocket client connected")
-    socketio.emit('mqtt_message', {'topic': 'test', 'data': 'Hello, WebSocket!'})
+    socketio.emit('mqtt_message', {'topic': 'test', 'data': "{'hey':'ho'}"})
 
 # MQTT callback functions
 def on_connect(client, userdata, flags, rc):
@@ -22,10 +22,15 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(secrets.MQTT_TOPIC)
     
 
+# def on_message(client, userdata, msg):
+#     decoded=json.loads(msg.payload.decode())
+#     print(f"MQTT Message: {decoded}")
+#     socketio.emit('mqtt_message', {'topic': msg.topic, 'data': decoded})
 def on_message(client, userdata, msg):
-    decoded=json.loads(msg.payload.decode())
-    print(f"MQTT Message: {decoded}")
-    socketio.emit('mqtt_message', {'topic': msg.topic, 'data': decoded})
+    # decoded=json.loads()
+    print(f"MQTT Message: {msg.payload.decode()}")
+    socketio.emit('mqtt_message', {'topic': msg.topic, 'data': msg.payload.decode()})
+    
     
 
 # Flask route

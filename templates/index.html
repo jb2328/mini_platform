@@ -25,7 +25,8 @@
 
             // Create a new <p> element
             const messageElement = document.createElement('p');
-            messageElement.textContent = `Topic: ${msg.topic}, Data: ${msg.data.acp_ts}`;
+            let parsed_data=JSON.parse(msg.data);
+            messageElement.textContent = `Topic: ${msg.topic}, Data: ${parsed_data.payload_cooked.crowdcount}`;
 
             // Append the new <p> element to the container
             document.getElementById('messages').appendChild(messageElement);
