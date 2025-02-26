@@ -21,15 +21,116 @@
         });
 
         socket.on('mqtt_message', function(msg) {
-            console.log('Received MQTT Message:', msg);
+            // console.log('Received MQTT Message:', msg);
 
-            // Create a new <p> element
             const messageElement = document.createElement('p');
-            let parsed_data=JSON.parse(msg.data);
-            messageElement.textContent = `{topic: ${msg.topic}, crowdcount: ${parsed_data.payload_cooked.crowdcount}, 'acp_ts: ${parsed_data.acp_ts}'}`;
+let parsed_data = JSON.parse(msg.data);
 
-            // Append the new <p> element to the container
-            document.getElementById('messages').appendChild(messageElement);
+console.log(parsed_data)
+
+// Convert acp_ts to readable format
+const readableTimestamp = new Date(parseFloat(parsed_data.acp_ts) * 1000).toLocaleString();
+
+// // Construct the HTML content
+// messageElement.innerHTML = `
+//     <table>
+//         <tr>
+//             <td><strong>${parsed_data.acp_id}</strong></td>
+//             <td><em>${readableTimestamp}</em></td>
+//         </tr>
+//     </table>
+// `;
+messageElement.innerHTML = `
+    <div style="display: inline-flex; align-items: center; gap: 1em;">
+        <em>${readableTimestamp}</em>
+        <strong style="min-width: 9em; display: inline-block;">${parsed_data.acp_id}</strong>
+    </div>
+`;
+
+
+// Append key-value pairs based on acp_type_id condition
+if (
+    parsed_data.acp_type_id === "cerberus-right" ||
+    parsed_data.acp_type_id === "cerberus-left" ||
+    parsed_data.acp_type_id === "cerberus-middle" ||
+    parsed_data.acp_type_id === "cerberus-node"
+) {
+    
+    if ("crowdcount" in parsed_data.payload_cooked) {
+        messageElement.innerHTML += `&nbsp;|&nbsp;<strong>🧑&nbsp;</strong> ${value} &nbsp;people`;
+    }
+} else {
+    for (let [key, value] of Object.entries(parsed_data.payload_cooked)) {
+        let keymoji;
+        let unit;
+        console.log("keyvalue",key,value)
+        switch(key){
+                case 'temperature':
+                keymoji='🌡️';
+                break;
+                case 'humidity':
+                keymoji='☁️';
+                break;
+                case 'co2':
+                keymoji='😮‍💨';
+                break;
+                case 'vdd':
+                keymoji='🔋';
+                value = (value / 1000).toFixed(2);
+                break;
+                case 'light':
+                keymoji='💡';
+                break;
+                case 'motion':
+                keymoji='🏃';
+                break;
+                case 'crowdcount':
+                keymoji='🧑';
+                break;
+                default:
+                keymoji=NaN;
+                break;
+        }
+
+        switch(key){
+                case 'temperature':
+                unit='°C';
+                break;
+                case 'humidity':
+                unit='%RH';
+                break;
+                case 'co2':
+                unit='ppm';
+                break;
+                case 'vdd':
+                unit='V';
+                break;
+                case 'light':
+                unit='lux';
+                break;
+                case 'motion':
+                unit='motion';
+                break;
+                case 'crowdcount':
+                unit='people';
+                break;
+                default:
+                unit='';
+                break;
+        }
+
+        if (keymoji) {
+    messageElement.innerHTML += `&nbsp;|&nbsp;<strong>${keymoji}</strong> ${value} &nbsp;${unit}&nbsp;&nbsp;`;
+}
+    }
+    messageElement.innerHTML += `<br>`;
+
+}
+
+// Append to body or a specific container
+document.body.appendChild(messageElement);
+
+
         });
 
         socket.on('disconnect', () => {
